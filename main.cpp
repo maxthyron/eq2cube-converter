@@ -24,131 +24,141 @@ std::unique_ptr<cv::Mat> getImage(const cv::String &path) {
     return image;
 }
 
-inline void createCubeMapFace(const cv::Mat &in, std::vector<cv::Mat *> faces,
-                              int faceId = 0, const int width = -1,
-                              const int height = -1) {
+inline void createCubeMapFace(const cv::Mat &in, cv::Mat &result) {
 
-    float inWidth = float(in.cols);
-    float inHeight = float(in.rows);
+    double inWidth = in.cols;
+    double inHeight = in.rows;
+
+    int faceSize = in.rows;
 
     // Allocate map
-    cv::Mat mapx(height, width, CV_32F);
-    cv::Mat mapy(height, width, CV_32F);
+    cv::Mat mapx(faceSize, faceSize, CV_32F); // it's a square
+    cv::Mat mapy(faceSize, faceSize, CV_32F);
 
     // Calculate adjacent (ak) and opposite (an) of the
     // triangle that is spanned from the sphere center
     //to our cube face.
-    const float an = sin(M_PI / 4);
-    const float ak = cos(M_PI / 4);
+    const double an = sin(M_PI / 4);
+    const double ak = cos(M_PI / 4);
+    double nx;
+    double ny;
+    float ftu;
+    float ftv;
+    double u, v;
+    double d;
+    int col, row;
 
-    const float ftu = faceTransform[faceId][0];
-    const float ftv = faceTransform[faceId][1];
+    cv::Mat face = cv::Mat(faceSize, faceSize, CV_8U, cv::Scalar(0));
 
-    // For each point in the target image,
-    // calculate the corresponding source coordinates.
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
+    for (int faceId = 0; faceId < 6; faceId++) {
+        ftu = faceTransform[faceId][0];
+        ftv = faceTransform[faceId][1];
 
-            // Map face pixel coordinates to [-1, 1] on plane
-            float nx = (float) y / (float) height - 0.5f;
-            float ny = (float) x / (float) width - 0.5f;
+        // For each point in the target image,
+        // calculate the corresponding source coordinates.
+        for (int y = 0; y < faceSize; y++) {
+            for (int x = 0; x < faceSize; x++) {
 
-            nx *= 2;
-            ny *= 2;
+                // Map face pixel coordinates to [-1, 1] on plane
+                nx = 2 * ((double) y / (double) faceSize - 0.5f);
+                ny = 2 * ((double) x / (double) faceSize - 0.5f);
 
-            // Map [-1, 1] plane coords to [-an, an]
-            // thats the coordinates in respect to a unit sphere
-            // that contains our box.
-            nx *= an;
-            ny *= an;
 
-            float u, v;
+                // Map [-1, 1] plane coords to [-an, an]
+                // thats the coordinates in respect to a unit sphere
+                // that contains our box.
+                nx *= an;
+                ny *= an;
 
-            // Project from plane to sphere surface.
-            if (ftv == 0) {
-                // Center faces
-                u = atan2(nx, ak);
-                v = atan2(ny * cos(u), ak);
-                u += ftu;
-            } else if (ftv > 0) {
-                // Bottom face
-                float d = sqrt(nx * nx + ny * ny);
-                v = M_PI / 2 - atan2(d, ak);
-                u = atan2(ny, nx);
-            } else {
-                // Top face
-                float d = sqrt(nx * nx + ny * ny);
-                v = -M_PI / 2 + atan2(d, ak);
-                u = atan2(-ny, nx);
+                // Project from plane to sphere surface.
+                if (ftv == 0) {
+                    // Center faces
+                    u = atan2(nx, ak);
+                    v = atan2(ny * cos(u), ak);
+                    u += ftu;
+                } else if (ftv > 0) {
+                    // Bottom face
+                    d = sqrt(nx * nx + ny * ny);
+                    v = M_PI / 2 - atan2(d, ak);
+                    u = atan2(ny, nx);
+                } else {
+                    // Top face
+                    d = sqrt(nx * nx + ny * ny);
+                    v = -M_PI / 2 + atan2(d, ak);
+                    u = atan2(-ny, nx);
+                }
+
+                // Map from angular coordinates to [-1, 1], respectively.
+                u = u / (M_PI);
+                v = v / (M_PI / 2);
+
+                // Warp around, if our coordinates are out of bounds.
+                while (v < -1) {
+                    v += 2;
+                    u += 1;
+                }
+                while (v > 1) {
+                    v -= 2;
+                    u += 1;
+                }
+
+                while (u < -1) {
+                    u += 2;
+                }
+                while (u > 1) {
+                    u -= 2;
+                }
+
+                // Map from [-1, 1] to in texture space
+                u = u / 2.0f + 0.5f;
+                v = v / 2.0f + 0.5f;
+
+                u = u * (inWidth - 1);
+                v = v * (inHeight - 1);
+
+                // Save the result for this pixel in map
+                mapx.at<float>(x, y) = u;
+                mapy.at<float>(x, y) = v;
             }
-
-            // Map from angular coordinates to [-1, 1], respectively.
-            u = u / (M_PI);
-            v = v / (M_PI / 2);
-
-            // Warp around, if our coordinates are out of bounds.
-            while (v < -1) {
-                v += 2;
-                u += 1;
-            }
-            while (v > 1) {
-                v -= 2;
-                u += 1;
-            }
-
-            while (u < -1) {
-                u += 2;
-            }
-            while (u > 1) {
-                u -= 2;
-            }
-
-            // Map from [-1, 1] to in texture space
-            u = u / 2.0f + 0.5f;
-            v = v / 2.0f + 0.5f;
-
-            u = u * (inWidth - 1);
-            v = v * (inHeight - 1);
-
-            // Save the result for this pixel in map
-            mapx.at<float>(x, y) = u;
-            mapy.at<float>(x, y) = v;
         }
-    }
 
-    cv::Mat &face = (*faces[faceId]);
-    // Recreate output image if it has wrong size or type.
-    if (face.cols != width || face.rows != height ||
-        face.type() != in.type()) {
-        face = cv::Mat(width, height, in.type());
-    }
+        // Do actual resampling using OpenCV's remap
+        cv::remap(in, face, mapx, mapy, cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
 
-    // Do actual resampling using OpenCV's remap
-    cv::remap(in, face, mapx, mapy,
-              cv::INTER_LINEAR, cv::BORDER_CONSTANT, cv::Scalar(0, 0, 0));
+        cv::Mat fixRotate;
+        if (faceId < 4) {
+            col = (faceId + 1) % 4;
+            row = 1;
+        } else {
+            if (faceId == 4) {
+                fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2, face.cols / 2), -90, 1);
+            }
+            else {
+                fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2 - 1, face.cols / 2), 90, 1);
+            }
+
+            cv::warpAffine(face, face, fixRotate, face.size());
+            col = 1;
+            row = (faceId % 4) * 2;
+        }
+
+        face.copyTo(result(cv::Rect(col * faceSize, row * faceSize, faceSize, faceSize)));
+    }
 }
 
-// Mat image(600, 800, CV_8UC3, Scalar(100, 250, 30));
 int main() {
     std::unique_ptr<cv::Mat> source = getImage("../image.jpg");
-    std::cout << (*source).cols << " : " << (*source).rows << std::endl;
-    std::vector<cv::Mat *> images = std::vector<cv::Mat *>();
-    for (int i = 0; i < 6; i++) {
-        images.push_back(new cv::Mat());
-    }
-    //    cv::Mat *image = new cv::Mat((*source).rows, (*source).cols, (*source).type());
 
-    for (int i = 0; i < 6; i++)
-        createCubeMapFace(*source, images, i, (*source).rows, (*source).rows);
+    cv::Mat *result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
+
+    createCubeMapFace(*source, *result);
 
     cv::String windowReference = "Reference";
     cv::String windowResult = "Result";
-    for (int i = 0; i < 6; i++)
-        cv::namedWindow(windowResult + cv::format("%d", i));
-    for (int i = 0; i < 6; i++) {
-        cv::imshow(windowResult + cv::format("%d", i), (*images[i]));
-        cv::imwrite(windowResult + cv::format("%d.jpg", i), (*images[i]));
-    }
+
+    cv::namedWindow(windowResult);
+    cv::imshow(windowResult, *result);
+
     cv::namedWindow(windowReference);
     cv::imshow(windowReference, *source);
     cv::waitKey(0);
