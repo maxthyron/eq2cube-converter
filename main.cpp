@@ -2,6 +2,8 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <dirent.h>
+#include <sys/stat.h>
 
 float faceTransform[6][2] =
     {
@@ -132,8 +134,7 @@ inline void createCubeMapFace(const cv::Mat &in, cv::Mat &result) {
         } else {
             if (faceId == 4) {
                 fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2, face.cols / 2), -90, 1);
-            }
-            else {
+            } else {
                 fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2 - 1, face.cols / 2), 90, 1);
             }
 
@@ -146,24 +147,40 @@ inline void createCubeMapFace(const cv::Mat &in, cv::Mat &result) {
     }
 }
 
-int main() {
-    std::unique_ptr<cv::Mat> source = getImage("../image.jpg");
+void get_files(char *dirPath, std::vector<std::string> &files) {
+    DIR *dir;
+    dirent *pdir;
 
-    cv::Mat *result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
+    dir = opendir(dirPath);
+    while ((pdir = readdir(dir)) != nullptr) {
+        if (strcmp(pdir->d_name, ".") != 0 && strcmp(pdir->d_name, "..") != 0)
+            files.emplace_back(pdir->d_name);
+    }
+    closedir(dir);
+}
 
-    createCubeMapFace(*source, *result);
 
-    cv::String windowReference = "Reference";
-    cv::String windowResult = "Result";
+int main(int argc, char **argv) {
+    std::vector<std::string> files;
+    std::unique_ptr<cv::Mat> source;
+    std::string path = argv[1];
+    std::string outputDir = "../output";
+    cv::Mat *result;
+    if (argc > 1) {
+        get_files(argv[1], files);
 
-    cv::namedWindow(windowResult);
-    cv::imshow(windowResult, *result);
+        for (const std::string &file : files) {
+            std::cout << path + "/" + file << "\n";
+            source = getImage(path + "/" + file);
+            result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
 
-    cv::namedWindow(windowReference);
-    cv::imshow(windowReference, *source);
-    cv::waitKey(0);
-    cv::destroyWindow(windowResult);
-    cv::destroyWindow(windowReference);
+            createCubeMapFace(*source, *result);
+            cv::imwrite(outputDir + "/" + file, (*result));
+        }
+    }
+    else {
+        std::cout << "Directory error!" << std::endl;
+    }
 
     return 0;
 }
