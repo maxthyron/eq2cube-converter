@@ -31,7 +31,8 @@ int main(int argc, char **argv) {
         }
     }
 
-    std::cout << "\n" << "TIME: " << (std::clock() - clock_start) / (double)(CLOCKS_PER_SEC / 1000.0f) << "ms" << std::endl;
+    std::cout << "\n" << "TIME: " << (std::clock() - clock_start) / (double) (CLOCKS_PER_SEC / 1000.0f) << "ms"
+              << std::endl;
 
     return 0;
 }

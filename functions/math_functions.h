@@ -3,23 +3,23 @@
 
 static double faceTransform[6][2] =
         {
-                {0, 0},
+                {0,         0},
                 {M_PI / 2, 0},
-                {M_PI, 0},
+                {M_PI,      0},
                 {-M_PI / 2, 0},
-                {0, -M_PI / 2},
-                {0, M_PI / 2}
+                {0,         -M_PI / 2},
+                {0,        M_PI / 2}
         };
 
 
-inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
+inline void createCubeMapFace(const cv::Mat &in, cv::Mat &result) {
     double inWidth = in.cols;
     double inHeight = in.rows;
 
     int faceSize = in.rows;
 
     // Allocate map
-    cv::Mat mapx(faceSize, faceSize, CV_32F); // it's a square
+    cv::Mat mapx(faceSize, faceSize, CV_32F);
     cv::Mat mapy(faceSize, faceSize, CV_32F);
 
     // Calculate adjacent (ak) and opposite (an) of the
@@ -47,8 +47,8 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
             for (int x = 0; x < faceSize; x++) {
 
                 // Map face pixel coordinates to [-1, 1] on plane
-                nx = 2 * ((double)y / (double)faceSize - 0.5f);
-                ny = 2 * ((double)x / (double)faceSize - 0.5f);
+                nx = 2 * ((double) y / (double) faceSize - 0.5f);
+                ny = 2 * ((double) x / (double) faceSize - 0.5f);
 
 
                 // Map [-1, 1] plane coords to [-an, an]
@@ -63,14 +63,12 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
                     u = atan2(nx, ak);
                     v = atan2(ny * cos(u), ak);
                     u += ftu;
-                }
-                else if (ftv > 0) {
+                } else if (ftv > 0) {
                     // Bottom face
                     d = sqrt(nx * nx + ny * ny);
                     v = M_PI / 2 - atan2(d, ak);
                     u = atan2(ny, nx);
-                }
-                else {
+                } else {
                     // Top face
                     d = sqrt(nx * nx + ny * ny);
                     v = -M_PI / 2 + atan2(d, ak);
@@ -118,12 +116,11 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
         if (faceId < 4) {
             col = (faceId + 1) % 4;
             row = 1;
-        }
-        else {
+        } else {
             if (faceId == 4) {
-                fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2, face.cols / 2), -90, 1); // Get rid of this fix
-            }
-            else {
+                fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2, face.cols / 2), -90,
+                                                    1); // Get rid of this fix
+            } else {
                 fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2 - 1, face.cols / 2), 90, 1); //
             }
 

@@ -3,6 +3,8 @@
 #include <string>
 #include <pthread.h>
 
+#include <tbb/parallel_for.h>
+
 #include "functions/math_functions.h"
 #include "functions/util_functions.h"
 
