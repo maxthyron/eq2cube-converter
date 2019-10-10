@@ -3,8 +3,6 @@
 #include <string>
 #include <pthread.h>
 
-#include <tbb/parallel_for.h>
-
 #include "functions/math_functions.h"
 #include "functions/util_functions.h"
 
@@ -37,9 +35,6 @@ void *thread_function(void *threadarg) {
 int main(int argc, char **argv) {
     std::clock_t clock_start;
     clock_start = std::clock();
-
-    std::unique_ptr<cv::Mat> source;
-    cv::Mat *result;
 
     std::string inputDir;
     std::string outputDir;
