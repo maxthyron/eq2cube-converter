@@ -70,6 +70,6 @@ int main(int argc, char **argv) {
 
     std::cout << "\n" << "TIME: " << (std::clock() - clock_start) / (double) (CLOCKS_PER_SEC / 1000.0f) << "ms"
               << std::endl;
-    pthread_exit(nullptr);
+
     return 0;
 }
