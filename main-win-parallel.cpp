@@ -26,13 +26,16 @@ void *thread_function(void *threadarg) {
 
 
 int main(int argc, char **argv) {
-    std::vector<std::string> files;
     std::unique_ptr<cv::Mat> source;
-    std::string path = R"(C:\Users\User\Desktop\Converter\Converter\x64\Release\images)"; //  R"(C:\Users\User\Desktop\eq2cube-converter-master\cmake-build-debug\images)"; //
-    std::string outputDir = R"(C:\Users\User\Desktop\Converter\Converter\x64\Release\output)"; // R"(C:\Users\User\Desktop\eq2cube-converter-master\cmake-build-debug\output)"; //
     cv::Mat *result;
 
-    get_files(path, files);
+    std::string inputDir;
+    std::string outputDir;
+    std::vector<std::string> files;
+
+    get_directories(inputDir, outputDir);
+    get_files(inputDir, files);
+
     int rc;
 
     pthread_t threads[NUM_THREADS];
@@ -45,8 +48,8 @@ int main(int argc, char **argv) {
         int start = part_length * i;
         int end = start + part_length;
         for (int j = start; j < end; ++j) {
-            std::cout << path + "\\" + files[j] << "\n";
-            source = getImage(path + "\\" + files[j]);
+            std::cout << inputDir + "\\" + files[j] << "\n";
+            source = getImage(inputDir + "\\" + files[j]);
             result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
             td[i].result = result;
             td[i].source = &(*source);

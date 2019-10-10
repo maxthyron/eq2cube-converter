@@ -7,21 +7,25 @@
 
 
 int main(int argc, char **argv) {
-    std::vector<std::string> files;
     std::unique_ptr<cv::Mat> source;
-    std::string path = R"(../images/)";
-    std::string outputDir = R"(../output/)";
     cv::Mat *result;
 
-    get_files(path, files);
+    std::string inputDir;
+    std::string outputDir;
+    std::vector<std::string> files;
+
+    get_directories(inputDir, outputDir);
+    get_files(inputDir, files);
 
     for (const std::string &file : files) {
-        std::cout << path + "\\" + file << "\n";
-        source = getImage(path + "\\" + file);
-        result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
+        std::cout << file << "\n";
+        source = getImage(inputDir + file);
+        if (source != nullptr) {
+            result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
 
-        createCubeMapFace(*source, *result);
-        cv::imwrite(outputDir + "\\" + file, (*result));
+            createCubeMapFace(*source, *result);
+            cv::imwrite(outputDir + file, (*result));
+        }
     }
 
     return 0;

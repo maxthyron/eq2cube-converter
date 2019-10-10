@@ -10,12 +10,16 @@ std::unique_ptr<cv::Mat> getImage(const cv::String &path) {
     *image = cv::imread(path);
     if ((*image).empty()) {
         std::cout << "Image doesn't exist" << std::endl;
-        std::cin.get();
         return nullptr;
     }
     return image;
 }
 
+
+void get_directories(std::string &inputDir, std::string &outputDir) {
+    inputDir = R"(../input/)";
+    outputDir = R"(../output/)";
+}
 
 void get_files(const std::string &dirPath, std::vector<std::string> &files) { // TODO: Refactor - Find better solution
     DIR *dir;
