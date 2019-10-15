@@ -6,7 +6,6 @@
 #include "functions/math_functions.h"
 #include "functions/util_functions.h"
 
-
 struct thread_data {
     std::string inputDir;
     std::string outputDir;
@@ -31,11 +30,7 @@ void *thread_function(void *threadarg) {
 
 #define NUM_THREADS 16
 
-
 int main(int argc, char **argv) {
-    std::clock_t clock_start;
-    clock_start = std::clock();
-
     std::unique_ptr<cv::Mat> source;
     cv::Mat *result;
 
@@ -67,9 +62,6 @@ int main(int argc, char **argv) {
     for (auto &thread : threads) {
         pthread_join(thread, nullptr);
     }
-
-    std::cout << "\n" << "TIME: " << (std::clock() - clock_start) / (double) (CLOCKS_PER_SEC / 1000.0f) << "ms"
-              << std::endl;
-    pthread_exit(nullptr);
+    
     return 0;
 }

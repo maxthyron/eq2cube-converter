@@ -18,20 +18,15 @@ int main(int argc, char **argv) {
     get_files(inputDir, files);
 
 
-    if (argc > 1) {
-        get_files(argv[1], files);
+    for (const std::string &file : files) {
+        std::cout << inputDir + file << "\n";
+        source = getImage(inputDir + file);
+        result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
 
-        for (const std::string &file : files) {
-            std::cout << inputDir + file << "\n";
-            source = getImage(inputDir + file);
-            result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
-
-            createCubeMapFace(*source, *result);
-            cv::imwrite(outputDir + file, (*result));
-        }
-    } else {
-        std::cout << "Directory error!" << std::endl;
+        createCubeMapFace(*source, *result);
+        cv::imwrite(outputDir + "out-" + file, (*result));
     }
+
 
     return 0;
 }

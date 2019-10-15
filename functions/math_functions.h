@@ -1,18 +1,22 @@
 #ifndef CONVERTER_MATH_FUNCTIONS_H
 #define CONVERTER_MATH_FUNCTIONS_H
 
-static double faceTransform[6][2] =
-        {
-                {0, 0},
-                {M_PI / 2, 0},
-                {M_PI, 0},
-                {-M_PI / 2, 0},
-                {0, -M_PI / 2},
-                {0, M_PI / 2}
-        };
+#include <opencv2/opencv.hpp>
+#include <chrono>
 
+using namespace std::chrono;
 
-inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
+static float faceTransform[6][2] =
+    {
+        {0, 0},
+        {M_PI / 2, 0},
+        {M_PI, 0},
+        {-M_PI / 2, 0},
+        {0, -M_PI / 2},
+        {0, M_PI / 2}
+    };
+
+inline void createCubeMapFace(const cv::Mat &in, cv::Mat &result) {
     double inWidth = in.cols;
     double inHeight = in.rows;
 
@@ -25,19 +29,21 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
     // Calculate adjacent (ak) and opposite (an) of the
     // triangle that is spanned from the sphere center
     //to our cube face.
-    const double an = sin(M_PI / 4); // Maybe use class for this
-    const double ak = cos(M_PI / 4);
-    double nx;
-    double ny;
+    const auto an = (float) sin(M_PI / 4); // Maybe use class for this
+    const auto ak = (float) cos(M_PI / 4);
+    float nx;
+    float ny;
     float ftu;
     float ftv;
-    double u, v;
-    double d;
+    float u, v;
+    float d;
     int col, row;
 
     cv::Mat face = cv::Mat(faceSize, faceSize, CV_8U, cv::Scalar(0));
+    auto start = high_resolution_clock::now();
 
     for (int faceId = 0; faceId < 6; faceId++) {
+
         ftu = faceTransform[faceId][0];
         ftv = faceTransform[faceId][1];
 
@@ -47,8 +53,8 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
             for (int x = 0; x < faceSize; x++) {
 
                 // Map face pixel coordinates to [-1, 1] on plane
-                nx = 2 * ((double)y / (double)faceSize - 0.5f);
-                ny = 2 * ((double)x / (double)faceSize - 0.5f);
+                nx = 2 * ((float) y / (float) faceSize - 0.5f);
+                ny = 2 * ((float) x / (float) faceSize - 0.5f);
 
 
                 // Map [-1, 1] plane coords to [-an, an]
@@ -63,23 +69,21 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
                     u = atan2(nx, ak);
                     v = atan2(ny * cos(u), ak);
                     u += ftu;
-                }
-                else if (ftv > 0) {
+                } else if (ftv > 0) {
                     // Bottom face
                     d = sqrt(nx * nx + ny * ny);
                     v = M_PI / 2 - atan2(d, ak);
                     u = atan2(ny, nx);
-                }
-                else {
+                } else {
                     // Top face
                     d = sqrt(nx * nx + ny * ny);
-                    v = -M_PI / 2 + atan2(d, ak);
+                    v = (float) -M_PI / 2 + atan2(d, ak);
                     u = atan2(-ny, nx);
                 }
 
                 // Map from angular coordinates to [-1, 1], respectively.
-                u = u / (M_PI);
-                v = v / (M_PI / 2);
+                u = u / (float) M_PI;
+                v = v / (float) (M_PI / 2);
 
                 // Warp around, if our coordinates are out of bounds.
                 while (v < -1) {
@@ -102,8 +106,8 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
                 u = u / 2.0f + 0.5f;
                 v = v / 2.0f + 0.5f;
 
-                u = u * (inWidth - 1);
-                v = v * (inHeight - 1);
+                u = (float) (u * (inWidth - 1));
+                v = (float) (v * (inHeight - 1));
 
                 // Save the result for this pixel in map
                 mapx.at<float>(x, y) = u;
@@ -118,15 +122,13 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
         if (faceId < 4) {
             col = (faceId + 1) % 4;
             row = 1;
-        }
-        else {
+        } else {
             if (faceId == 4) {
-                fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2, face.cols / 2), -90, 1); // Get rid of this fix
-            }
-            else {
+                fixRotate =
+                    cv::getRotationMatrix2D(cv::Point(face.rows / 2, face.cols / 2), -90, 1); // Get rid of this fix
+            } else {
                 fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2 - 1, face.cols / 2), 90, 1); //
             }
-
 
             cv::warpAffine(face, face, fixRotate, face.size()); //
             col = 1;
@@ -134,7 +136,11 @@ inline void createCubeMapFace(const cv::Mat& in, cv::Mat& result) {
         }
 
         face.copyTo(result(cv::Rect(col * faceSize, row * faceSize, faceSize, faceSize)));
+
     }
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(stop - start);
+    std::cout << "Time taken by function: " << duration.count() << " ms" << std::endl;
 }
 
 #endif //CONVERTER_MATH_FUNCTIONS_H
