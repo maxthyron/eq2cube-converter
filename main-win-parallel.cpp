@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <pthread.h>
+#include <chrono>
 
 #include "functions/math_functions.h"
 #include "functions/util_functions.h"
@@ -50,10 +51,11 @@ int main(int argc, char **argv) {
     int part_last = (int) files.size() % NUM_THREADS;
     std::cout << files.size() << " - " << part_length << std::endl;
     std::vector<std::string> files_part;
+    auto clock_start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < NUM_THREADS; ++i) {
-        int start = int(i < part_last ? (part_length + 1) * i : files.size() - (NUM_THREADS - i) * part_length);
-        int end = start + part_length + (i < part_last);
-        files_part = std::vector<std::string>(files.begin() + start, files.begin() + end);
+        int block_start = int(i < part_last ? (part_length + 1) * i : files.size() - (NUM_THREADS - i) * part_length);
+        int block_end = block_start + part_length + (i < part_last);
+        files_part = std::vector<std::string>(files.begin() + block_start, files.begin() + block_end);
         td[i].inputDir = inputDir;
         td[i].outputDir = outputDir;
         td[i].files_part = files_part;
@@ -62,6 +64,8 @@ int main(int argc, char **argv) {
     for (auto &thread : threads) {
         pthread_join(thread, nullptr);
     }
-    
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<milliseconds>(stop - clock_start);
+    std::cout << "Time taken by function: " << duration.count() << " ms" << std::endl;
     return 0;
 }
