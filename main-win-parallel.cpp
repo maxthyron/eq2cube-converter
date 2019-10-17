@@ -64,6 +64,7 @@ int main(int argc, char **argv) {
     std::cout << files.size() << " - " << part_length << std::endl;
     std::vector<std::string> files_part;
 
+    // TODO: Create function for this
     std::vector<std::vector<cv::Mat *> *> maps; // Creates maps for specific resolution
     for (int i = 0; i < 6; i++) {
         maps.push_back(new std::vector<cv::Mat *>);
