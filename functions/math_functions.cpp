@@ -2,14 +2,14 @@
 
 // Creates cube map by interpolating between two maps and input image
 void createCubeMapFace(std::vector<std::vector<cv::Mat *> *> &maps, const cv::Mat &in, cv::Mat &result) {
-    int faceSize = in.rows;
+    int faceSize = MAP_SIZE;
     cv::Mat face = cv::Mat(faceSize, faceSize, CV_8U, cv::Scalar(0));
     for (int faceId = 0; faceId < 6; faceId++) {
         cv::Mat mapx = *(*maps[faceId])[0];
         cv::Mat mapy = *(*maps[faceId])[1];
 
         int col, row;
-        cv::remap(in, face, mapx, mapy, cv::INTER_LINEAR, cv::BORDER_TRANSPARENT);
+        cv::remap(in, face, mapx, mapy, cv::INTER_LINEAR, cv::BORDER_CONSTANT); // Create cube face
 
         cv::Mat fixRotate;
         if (faceId < 4) {
@@ -23,11 +23,10 @@ void createCubeMapFace(std::vector<std::vector<cv::Mat *> *> &maps, const cv::Ma
                 fixRotate = cv::getRotationMatrix2D(cv::Point(face.rows / 2 - 1, face.cols / 2), 90, 1); //
             }
 
-            cv::warpAffine(face, face, fixRotate, face.size()); //
+            cv::warpAffine(face, face, fixRotate, face.size());  // Needed rotations of 5 and 6 faces
             col = 1;
             row = (faceId % 4) * 2;
         }
-
-        face.copyTo(result(cv::Rect(col * faceSize, row * faceSize, faceSize, faceSize)));
+        face.copyTo(result(cv::Rect(col * faceSize, row * faceSize, faceSize, faceSize))); // Move cube face to specific area in result image
     }
 }
