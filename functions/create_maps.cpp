@@ -13,8 +13,8 @@ void createMaps(int inWidth, int inHeight, int faceSize, std::vector<std::vector
     for (int faceId = 0; faceId < 6; faceId++) {
         ftu = faceTransform[faceId][0];
         ftv = faceTransform[faceId][1];
-        // Allocate map
-        std::cout << faceSize << std::endl;
+        // Allocate maps
+
         auto *mapx = new cv::Mat(faceSize, faceSize, CV_32F); // it's a square
         auto *mapy = new cv::Mat(faceSize, faceSize, CV_32F);
 
