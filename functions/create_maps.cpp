@@ -1,5 +1,6 @@
 #include "create_maps.h"
 
+// Creates two maps for further interpolation
 void createMaps(int inWidth, int inHeight, int faceSize, std::vector<std::vector<cv::Mat*>*> &maps) {
     const auto an = (float) sin(M_PI / 4); // Maybe use class for this
     const auto ak = (float) cos(M_PI / 4);

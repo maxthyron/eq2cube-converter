@@ -1,5 +1,6 @@
 #include "math_functions.h"
 
+// Creates cube map by interpolating between two maps and input image
 void createCubeMapFace(std::vector<std::vector<cv::Mat *> *> &maps, const cv::Mat &in, cv::Mat &result) {
     int faceSize = in.rows;
     cv::Mat face = cv::Mat(faceSize, faceSize, CV_8U, cv::Scalar(0));
