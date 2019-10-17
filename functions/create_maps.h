@@ -2,7 +2,6 @@
 #define CONVERTER_CREATE_MAPS_H
 
 #include <opencv2/opencv.hpp>
-#include <chrono>
 
 static float faceTransform[6][2] =
         {
@@ -16,6 +15,6 @@ static float faceTransform[6][2] =
 
 
 
-void create_maps(int inWidth, int inHeight, int faceSize, std::vector<std::vector<cv::Mat*>*> &maps);
+void createMaps(int inWidth, int inHeight, int faceSize, std::vector<std::vector<cv::Mat*>*> &maps);
 
 #endif //CONVERTER_CREATE_MAPS_H

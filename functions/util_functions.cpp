@@ -12,12 +12,12 @@ std::unique_ptr<cv::Mat> getImage(const cv::String &path) {
 }
 
 
-void get_directories(std::string &inputDir, std::string &outputDir) {
-    inputDir = R"(../test-input/)";
-    outputDir = R"(../test-output/)";
+void getDirectories(std::string &inputDir, std::string &outputDir) {
+    inputDir = R"(../input/)";
+    outputDir = R"(../output/)";
 }
 
-void get_files(const std::string &dirPath, std::vector<std::string> &files) { // TODO: Refactor - Find better solution
+void getFiles(const std::string &dirPath, std::vector<std::string> &files) { // TODO: Refactor - Find better solution
     DIR *dir;
     dirent *pdir;
 

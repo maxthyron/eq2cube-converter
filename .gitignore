@@ -1,5 +1,6 @@
-input/
-output/
+*input/
+*output/
+*temp/
 .DS_Store
 cmake-*
 .idea/*

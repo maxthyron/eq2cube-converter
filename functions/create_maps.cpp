@@ -1,6 +1,6 @@
 #include "create_maps.h"
 
-void create_maps(int inWidth, int inHeight, int faceSize, std::vector<std::vector<cv::Mat*>*> &maps) {
+void createMaps(int inWidth, int inHeight, int faceSize, std::vector<std::vector<cv::Mat*>*> &maps) {
     const auto an = (float) sin(M_PI / 4); // Maybe use class for this
     const auto ak = (float) cos(M_PI / 4);
     float nx;
@@ -14,6 +14,7 @@ void create_maps(int inWidth, int inHeight, int faceSize, std::vector<std::vecto
         ftu = faceTransform[faceId][0];
         ftv = faceTransform[faceId][1];
         // Allocate map
+        std::cout << faceSize << std::endl;
         auto *mapx = new cv::Mat(faceSize, faceSize, CV_32F); // it's a square
         auto *mapy = new cv::Mat(faceSize, faceSize, CV_32F);
 

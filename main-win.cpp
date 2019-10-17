@@ -17,8 +17,8 @@ int main(int argc, char **argv) {
     std::string outputDir;
     std::vector<std::string> files;
 
-    get_directories(inputDir, outputDir);
-    get_files(inputDir, files);
+    getDirectories(inputDir, outputDir);
+    getFiles(inputDir, files);
 
     for (const std::string &file : files) {
         std::cout << file << "\n";
