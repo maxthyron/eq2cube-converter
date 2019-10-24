@@ -1,5 +1,7 @@
-input/
-output/
+*input/
+CMakeLists.txt.user
+*output/
+*temp/
 .DS_Store
 cmake-*
 .idea/*

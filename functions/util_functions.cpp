@@ -1,10 +1,7 @@
-#include <opencv2/opencv.hpp>
-#include <string>
-#include <iostream>
-#include <dirent.h>
 
 #include "util_functions.h"
 
+// Creates cv::Mat from image file
 std::unique_ptr<cv::Mat> getImage(const cv::String &path) {
     std::unique_ptr<cv::Mat> image(new cv::Mat);
     *image = cv::imread(path);
@@ -15,13 +12,14 @@ std::unique_ptr<cv::Mat> getImage(const cv::String &path) {
     return image;
 }
 
-
-void get_directories(std::string &inputDir, std::string &outputDir) {
-    inputDir = R"(../input/)";
-    outputDir = R"(../output/)";
+// Returns input and output directories
+void getDirectories(std::string &inputDir, std::string &outputDir) {
+    inputDir = R"(../test-input/)";
+    outputDir = R"(../test-output/)";
 }
 
-void get_files(const std::string &dirPath, std::vector<std::string> &files) { // TODO: Refactor - Find better solution
+// Gets all files from dirPath directory
+void getFiles(const std::string &dirPath, std::vector<std::string> &files) { // TODO: Refactor - Find better solution
     DIR *dir;
     dirent *pdir;
 
@@ -35,5 +33,4 @@ void get_files(const std::string &dirPath, std::vector<std::string> &files) { //
     } else {
         std::cout << "Directory not found!" << std::endl;
     }
-
 }

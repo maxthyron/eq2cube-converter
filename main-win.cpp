@@ -5,11 +5,7 @@
 #include "functions/math_functions.h"
 #include "functions/util_functions.h"
 
-
 int main(int argc, char **argv) {
-    std::clock_t clock_start;
-    clock_start = std::clock();
-
     std::unique_ptr<cv::Mat> source;
     cv::Mat *result;
 
@@ -17,21 +13,30 @@ int main(int argc, char **argv) {
     std::string outputDir;
     std::vector<std::string> files;
 
-    get_directories(inputDir, outputDir);
-    get_files(inputDir, files);
+    getDirectories(inputDir, outputDir);
+    getFiles(inputDir, files);
+
+    // TODO: Create function for this
+    std::vector<std::vector<cv::Mat *> *> maps; // Creates maps for specific resolution
+    for (int i = 0; i < 6; i++) {
+        maps.push_back(new std::vector<cv::Mat *>);
+    }
+    std::unique_ptr<cv::Mat> sample_image = getImage(inputDir + files[0]);
+    int inWidth = sample_image->cols;
+    int inHeight = sample_image->rows;
+    int faceSize = MAP_SIZE;
+    createMaps(inWidth, inHeight, faceSize, maps);
 
     for (const std::string &file : files) {
         std::cout << file << "\n";
         source = getImage(inputDir + file);
         if (source != nullptr) {
-            result = new cv::Mat((*source).rows * 3, (*source).rows * 4, (*source).type());
+            result = new cv::Mat(MAP_SIZE * 3, MAP_SIZE * 4, (*source).type());
 
-            createCubeMapFace(*source, *result);
+            createCubeMapFace(maps, *source, *result);
             cv::imwrite(outputDir + file, (*result));
         }
     }
-
-    std::cout << "\n" << "TIME: " << (std::clock() - clock_start) / (double)(CLOCKS_PER_SEC / 1000.0f) << "ms" << std::endl;
 
     return 0;
 }

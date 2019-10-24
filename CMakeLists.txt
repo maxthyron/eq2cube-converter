@@ -20,6 +20,7 @@ find_package(Qt5Gui REQUIRED)
 set(TBB_ROOT "/usr/local/Cellar/tbb/2019_U8/")
 find_package(TBB REQUIRED COMPONENTS tbb OPTIONAL_COMPONENTS malloc)
 
+
 set(OpenCV_DIR C:/Users/User/Desktop/opencv/mingw-build/)
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
