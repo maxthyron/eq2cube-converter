@@ -48,6 +48,7 @@ void thread_convert() {
 
     // TODO: Create function for this
     std::vector<std::vector<cv::Mat *> *> maps; // Creates maps for specific resolution
+    maps.reserve(6);
     for (int i = 0; i < 6; i++) {
         maps.push_back(new std::vector<cv::Mat *>);
     }
@@ -78,12 +79,10 @@ void thread_convert() {
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - clock_start);
     std::cout << "Overall time: " << duration.count() << " ms" << std::endl;
 
-    for (auto & map : maps) { // Free all allocated memory
+    for (auto &map : maps) { // Free all allocated memory
         delete (*map)[0];
         delete (*map)[1];
         delete map;
     }
-
-    return;
 }
 
