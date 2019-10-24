@@ -4,21 +4,22 @@ project(converter)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
+# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUI ON)
 set(CMAKE_AUTOUIC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(CMAKE_PREFIX_PATH "/Users/thyron/Qt/5.11.2/clang_64/lib/cmake")
+# set(CMAKE_PREFIX_PATH "/Users/thyron/Qt/5.11.2/clang_64/lib/cmake")
+set(CMAKE_PREFIX_PATH "C:/Qt/Qt5.13.1/5.13.1/mingw73_64/lib/cmake/Qt/Qt5.13.1/5.13.1/mingw73_64/lib/cmake")
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Gui REQUIRED)
 
-set(TBB_ROOT "/usr/local/Cellar/tbb/2019_U8/")
-find_package(TBB REQUIRED COMPONENTS tbb OPTIONAL_COMPONENTS malloc)
+# set(TBB_ROOT "/usr/local/Cellar/tbb/2019_U8/")
+# find_package(TBB REQUIRED COMPONENTS tbb OPTIONAL_COMPONENTS malloc)
 
 
 set(OpenCV_DIR C:/Users/User/Desktop/opencv/mingw-build/)
@@ -26,7 +27,7 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 set(OpenCV_LIBS opencv_core opencv_imgproc opencv_highgui opencv_imgcodecs)
 
-set(SOURCE_FUNCTIONS functions/math_functions.cpp functions/math_functions.h functions/util_functions.cpp functions/util_functions.h)
+set(SOURCE_FUNCTIONS functions/math_functions.cpp functions/math_functions.h functions/util_functions.cpp functions/util_functions.h functions/create_maps.cpp functions/create_maps.h)
 set(SOURCE_APP app/window.cpp app/window.h)
 
 add_executable(converter main.cpp ${SOURCE_FUNCTIONS})
