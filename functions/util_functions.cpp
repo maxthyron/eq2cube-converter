@@ -14,8 +14,8 @@ std::unique_ptr<cv::Mat> getImage(const cv::String &path) {
 
 // Returns input and output directories
 void getDirectories(std::string &inputDir, std::string &outputDir) {
-    inputDir = R"(../test-input/)";
-    outputDir = R"(../test-output/)";
+    inputDir = R"(../input-test/)";
+    outputDir = R"(../output-test/)";
 }
 
 // Gets all files from dirPath directory
