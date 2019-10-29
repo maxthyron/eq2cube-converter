@@ -1,8 +1,13 @@
-*input/
+# Source
+*input*/
+*output*/
+*temp*/
+
+# CMake and IDE
 CMakeLists.txt.user
-*output/
-*temp/
-.DS_Store
 cmake-*
 .idea/*
+
+# MacOS
+.DS_Store
 
