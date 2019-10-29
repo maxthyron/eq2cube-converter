@@ -28,12 +28,13 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 set(OpenCV_LIBS opencv_core opencv_imgproc opencv_highgui opencv_imgcodecs)
 
 set(SOURCE_FUNCTIONS functions/math_functions.cpp functions/math_functions.h functions/util_functions.cpp functions/util_functions.h functions/create_maps.cpp functions/create_maps.h)
-set(SOURCE_APP app/window.cpp app/window.h)
+set(SOURCE_APP app/mainwindow.cpp app/mainwindow.h)
+set(SOURCE_THREADS functions/thread_functions.cpp functions/thread_functions.h)
 
 add_executable(converter main.cpp ${SOURCE_FUNCTIONS})
 add_executable(converter-win main-win.cpp ${SOURCE_FUNCTIONS})
-add_executable(converter-win-parallel main-win-parallel.cpp ${SOURCE_FUNCTIONS} functions/thread_functions.cpp functions/thread_functions.h)
-add_executable(converter-app app.cpp ${SOURCE_APP} ${SOURCE_FUNCTIONS} ${UIS} functions/thread_functions.cpp functions/thread_functions.h)
+add_executable(converter-win-parallel main-win-parallel.cpp ${SOURCE_FUNCTIONS} ${SOURCE_THREADS})
+add_executable(converter-app app.cpp ${SOURCE_APP} ${SOURCE_FUNCTIONS} ${SOURCE_THREADS})
 
 
 target_link_libraries(converter ${OpenCV_LIBS})
